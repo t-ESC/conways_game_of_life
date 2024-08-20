@@ -43,33 +43,74 @@ int main(int argc, char* argv[])
     //Clock for delay
     sf::Clock clock; // Create a clock object
     int updateDelay = 500; // Delay between updates in milliseconds
+    bool paused = false;
 
     while (window.isOpen())
     {
         sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
-                window.close();
-            if (event.type == sf::Event::KeyPressed)
+            if (event.type == sf::Event::Closed) window.close();
+            // Inputs seperated by paused input and unpaused input
+            if (paused)
             {
-                switch (event.key.code)
+                if (event.type == sf::Event::KeyPressed)
                 {
-                case sf::Keyboard::N:
-                    gameBoard.update_board();
-                    std::cout << "Board Updated!" << std::endl;
-                    std::cout.flush();
-                    break;
-                default:
-                    break;
+                    switch (event.key.code)
+                    {
+                    case sf::Keyboard::N:
+                        gameBoard.update_board();
+                        break;
+                    case sf::Keyboard::R:
+                        gameBoard.random_reset_grid();
+                        break;
+                    case sf::Keyboard::C:
+                        gameBoard.clear_board();
+                        break;
+                    case sf::Keyboard::Space:
+                        // Pause the game
+                        paused = !paused;
+                        break;
+                    default:
+                        break;
+                    }
                 }
+                else if (event.type == sf::Event::MouseButtonPressed)
+                {
+                    if (event.mouseButton.button == sf::Mouse::Left)
+                    {
+                        // Calculate the cell coordinates based on the mouse position
+                        int cellX = static_cast<int>(event.mouseButton.x / cellWidth);
+                        int cellY = static_cast<int>(event.mouseButton.y / cellHeight);
+
+                        // Toggle the state of the clicked cell
+                        gameBoard.toggle_zell(cellX, cellY);
+                    }
+                }
+            } else {
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    switch (event.key.code)
+                    {
+                    case sf::Keyboard::Space:
+                        // Pause the game
+                        paused = !paused;
+                        break;
+                    default:
+                        break;
+                    }
+                }            
             }
         }
 
-        // Check if enough time has passed to update the board
-        if (clock.getElapsedTime().asMilliseconds() >= updateDelay) {
-            gameBoard.update_board();
-            clock.restart(); // Reset the clock
+        // Game runs of not paused
+        if (!paused) 
+        {
+            // Check if enough time has passed to update the board
+            if (clock.getElapsedTime().asMilliseconds() >= updateDelay) {
+                gameBoard.update_board();
+                clock.restart(); // Reset the clock
+            }
         }
 
         window.clear();

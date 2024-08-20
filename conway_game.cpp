@@ -3,26 +3,25 @@
 Board::Board() {
     // resize vectror to appropriate size
     alive.resize(WIDTH, std::vector<bool>(HEIGHT, false));
+    this->random_reset_grid();
+}
 
+void Board::random_reset_grid() {
     for (int i = 0; i < WIDTH; i++) {
         for (int j = 0; j < HEIGHT; j++) {
             // Random Value projected between 0 and 1
-            alive[i][j] = (static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX)) < ALIVE_PROB;            
+            alive[i][j] = (static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX)) < ALIVE_PROB;
         }
     }
+}
 
-    alive[0][0] = false; // protagonist
-    alive[0][1] = true;
-    alive[0][2] = false;
-
-    alive[1][0] = false;
-    alive[1][1] = false; 
-    alive[1][2] = true;
-
-    alive[2][0] = true;
-    alive[2][1] = true;
-    alive[2][2] = true;
-
+void Board::clear_board() {
+    for (int i = 0; i < WIDTH; i++) {
+        for (int j = 0; j < HEIGHT; j++) {
+            // Random Value projected between 0 and 1
+            alive[i][j] = false;
+        }
+    }
 }
 
 int Board::count_alive_neighbours_of_cell(int width, int height) {
@@ -91,9 +90,6 @@ void Board::update_board() {
 }
 
 void Board::print_board() {
-    // std::cout << "Board_Updated: " << std::time(nullptr) << std::endl;
-    std::cout << count_alive_neighbours_of_cell(1, 0) << std::endl;
-
     for (int j = 0; j < HEIGHT; j++) {
         for (int i = 0; i < WIDTH; i++) {
             if (alive[i][j]) {
@@ -109,4 +105,9 @@ void Board::print_board() {
 bool Board::get_cell_status(int x, int y)
 {
     return alive[x][y];
+}
+
+void Board::toggle_zell(int x, int y)
+{
+    alive[x][y] = !alive[x][y];
 }
